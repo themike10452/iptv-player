@@ -55,6 +55,7 @@ app.on("ready", () => {
           "User-Agent": "VLC",
         },
         responseType: "stream",
+        timeout: 60_000,
         maxRedirects: 0,
         validateStatus: (status) => {
           return status >= 200 && status < 400;

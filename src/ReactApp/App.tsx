@@ -2,6 +2,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import {
   IconButton,
+  MessageBar,
+  MessageBarButton,
+  MessageBarType,
   SearchBox,
   Spinner,
   ThemeProvider,
@@ -9,8 +12,8 @@ import {
 } from "@fluentui/react";
 import { useBoolean } from "@fluentui/react-hooks";
 import { darkTheme } from "./themes";
-import { CategoriesList, ICategory } from "./CategoriesList";
-import { ChannelsList, IChannel } from "./ChannelsList";
+import { CategoriesList } from "./CategoriesList";
+import { ChannelsList } from "./ChannelsList";
 import { VideoPlayer } from "./VideoPlayer";
 import { SettingsDialog, SettingsProvider, useSettings } from "./Settings";
 import { useLiveCategories, useLiveChannels } from "./hooks";
@@ -28,8 +31,8 @@ function App() {
 }
 
 function IptvPlayer() {
-  const [activeCategory, setActiveCategory] = React.useState<ICategory>();
-  const [activeChannel, setActiveChannel] = React.useState<IChannel>();
+  const [activeCategory, setActiveCategory] = React.useState<LiveStreamCategory>();
+  const [activeChannel, setActiveChannel] = React.useState<LiveStream>();
   const { settings, isValid: validSettings } = useSettings();
   const [settingsDialogVisible, { toggle: toggleSettingsDialog }] =
     useBoolean(false);
@@ -82,83 +85,117 @@ function IptvPlayer() {
     setChannelSearchText("");
   }, [activeCategory]);
 
+  const reloadPage = React.useCallback(() => {
+    window.location.reload();
+  }, []);
+
   return (
     <>
       <div className="root">
-        <div className="side-nav-1">
-          <div className="side-nav-content-wrapper">
-            <div className="side-nav-search-wrapper">
-              <SearchBox
-                placeholder="Search"
-                value={categorySearchText}
-                onChange={(_, value) => {
-                  setCategorySearchText(value);
-                }}
-              />
-            </div>
-            <div className="side-nav-list scroll" data-is-scrollable>
-              {loadingCategories ? (
-                <div className="spinner-wrapper">
-                  <Spinner />
-                </div>
-              ) : (
-                <CategoriesList
-                  items={filteredCategories}
-                  selectedCategory={activeCategory}
-                  onItemSelected={setActiveCategory}
+        <div className="root-inner">
+          <div className="side-nav-1">
+            <div className="side-nav-content-wrapper">
+              <div className="side-nav-search-wrapper">
+                <SearchBox
+                  placeholder="Search"
+                  value={categorySearchText}
+                  onChange={(_, value) => {
+                    setCategorySearchText(value);
+                  }}
                 />
-              )}
+              </div>
+              <div className="side-nav-list scroll" data-is-scrollable>
+                {loadingCategories ? (
+                  <div className="spinner-wrapper">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <CategoriesList
+                    items={filteredCategories}
+                    selectedCategory={activeCategory}
+                    onItemSelected={setActiveCategory}
+                  />
+                )}
+              </div>
             </div>
+          </div>
+          <div className={`side-nav-2 ${activeCategory ? "" : "hidden"}`}>
+            <div className="side-nav-content-wrapper">
+              <div className="side-nav-search-wrapper">
+                <SearchBox
+                  placeholder="Search"
+                  value={channelSearchText}
+                  onChange={(_, value) => {
+                    setChannelSearchText(value);
+                  }}
+                />
+              </div>
+              <div className="side-nav-list scroll" data-is-scrollable>
+                {loadingChannels ? (
+                  <div className="spinner-wrapper">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <ChannelsList
+                    items={filteredChannels}
+                    selectedChannel={activeChannel}
+                    onItemSelected={setActiveChannel}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="content-wrapper">
+            <div className="action-bar-top">
+              <div className="action-bar-top--channel-name-wrapper">
+                <span className="action-bar-top--channel-name">
+                  {activeChannel?.name}
+                </span>
+              </div>
+              <div className="action-bar-top--buttons">
+                <IconButton
+                  iconProps={{ iconName: "Search" }}
+                />
+                {/* {activeChannel && (
+                  <IconButton iconProps={{ iconName: "FavoriteStar" }} />
+                )} */}
+                <IconButton
+                  iconProps={{ iconName: "Settings" }}
+                  onClick={toggleSettingsDialog}
+                />
+              </div>
+            </div>
+            {streamUrl && (
+              <VideoPlayer
+                stream={activeChannel}
+                streamUrl={streamUrl}
+                onClose={() => setActiveChannel(null)}
+              />
+            )}
           </div>
         </div>
-        <div className={`side-nav-2 ${activeCategory ? "" : "hidden"}`}>
-          <div className="side-nav-content-wrapper">
-            <div className="side-nav-search-wrapper">
-              <SearchBox
-                placeholder="Search"
-                value={channelSearchText}
-                onChange={(_, value) => {
-                  setChannelSearchText(value);
-                }}
-              />
-            </div>
-            <div className="side-nav-list scroll" data-is-scrollable>
-              {loadingChannels ? (
-                <div className="spinner-wrapper">
-                  <Spinner />
-                </div>
-              ) : (
-                <ChannelsList
-                  items={filteredChannels}
-                  selectedChannel={activeChannel}
-                  onItemSelected={setActiveChannel}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="content-wrapper">
-          <div className="action-bar-top">
-            <div className="action-bar-top--channel-name-wrapper">
-              <span className="action-bar-top--channel-name">
-                {activeChannel?.name}
-              </span>
-            </div>
-            <div className="action-bar-top--buttons">
-              {activeChannel && (
-                <IconButton iconProps={{ iconName: "FavoriteStar" }} />
-              )}
-              <IconButton
-                iconProps={{ iconName: "Settings" }}
-                onClick={toggleSettingsDialog}
-              />
-            </div>
-          </div>
-          {streamUrl && (
-            <VideoPlayer
-              streamUrl={streamUrl}
-              onClose={() => setActiveChannel(null)}
-            />
+        <div className="errors">
+          {errorLoadingCateogories && (
+            <MessageBar
+              messageBarType={MessageBarType.error}
+              isMultiline
+              actions={
+                <MessageBarButton onClick={reloadPage}>Reload</MessageBarButton>
+              }
+            >
+              {JSON.stringify(errorLoadingCateogories)}
+            </MessageBar>
+          )}
+          {errorLoadingChannels && (
+            <MessageBar
+              messageBarType={MessageBarType.error}
+              isMultiline
+              actions={
+                <MessageBarButton onClick={reloadPage}>Reload</MessageBarButton>
+              }
+            >
+              {JSON.stringify(errorLoadingChannels)}
+            </MessageBar>
           )}
         </div>
       </div>

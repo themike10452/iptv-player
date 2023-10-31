@@ -3,9 +3,9 @@ import { useSettings } from "./Settings";
 
 export const useLiveCategories = () => {
   const { settings, isValid: validSettings } = useSettings();
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState<LiveStreamCategory[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<any>();
+  const [error, setError] = React.useState<any>(null);
 
   React.useEffect(() => {
     if (!validSettings) {
@@ -30,7 +30,14 @@ export const useLiveCategories = () => {
       })
       .then((res) => {
         if (res.success) {
-          setData(res.data);
+          const categories = res.data as LiveStreamCategory[];
+          categories.unshift({
+            category_id: "",
+            category_name: "All Channels",
+          });
+          console.log(categories);
+          setData(categories);
+          setError(null);
         } else {
           console.error(res);
 					setData([]);
@@ -47,9 +54,9 @@ export const useLiveCategories = () => {
 
 export const useLiveChannels = (categoryId?: string | null) => {
   const { settings, isValid: validSettings } = useSettings();
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState<LiveStream[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<any>();
+  const [error, setError] = React.useState<any>(null);
 
   React.useEffect(() => {
     if (categoryId == null || !validSettings) {
@@ -74,7 +81,9 @@ export const useLiveChannels = (categoryId?: string | null) => {
       })
       .then((res) => {
         if (res.success) {
+          console.log(res.data);
           setData(res.data);
+          setError(null);
         } else {
           console.error(res);
 					setData([]);

@@ -25,8 +25,19 @@ body {
   inset: 0;
   position: absolute;
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	background-color: rgb(20, 20, 20);
+}
+
+.root-inner {
+	display: flex;
+	flex-direction: row;
+	flex: 1 1 auto;
+	overflow: hidden;
+}
+
+.errors {
+	flex: 0 0 auto;
 }
 
 .side-nav-1 {

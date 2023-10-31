@@ -1,23 +1,17 @@
 import React from "react";
 import { FocusZone, FocusZoneDirection, List } from "@fluentui/react";
 
-export interface IChannel {
-  stream_id: string;
-  name: string;
-  stream_icon?: string;
-}
-
 export interface IChannelsListProps {
-  items: IChannel[];
-  selectedChannel?: IChannel | null;
-  onItemSelected?: (item: IChannel) => void;
+  items: LiveStream[];
+  selectedChannel?: LiveStream | null;
+  onItemSelected?: (item: LiveStream) => void;
 }
 
 export const ChannelsList: React.FC<IChannelsListProps> = (props) => {
   const { items, onItemSelected, selectedChannel } = props;
 
   const onItemClick = React.useCallback(
-    (item: IChannel) => {
+    (item: LiveStream) => {
       if (onItemSelected) {
         onItemSelected(item);
       }
@@ -26,7 +20,7 @@ export const ChannelsList: React.FC<IChannelsListProps> = (props) => {
   );
 
   const renderItem = React.useCallback(
-    (item: IChannel) => {
+    (item: LiveStream) => {
       return (
         <div
           title={item.name}

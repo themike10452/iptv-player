@@ -1,22 +1,17 @@
 import React from "react";
 import { FocusZone, FocusZoneDirection, List } from "@fluentui/react";
 
-export interface ICategory {
-  category_id: string;
-  category_name: string;
-}
-
 export interface ICategoriesListProps {
-  items: ICategory[];
-  selectedCategory?: ICategory | null;
-  onItemSelected?: (item: ICategory) => void;
+  items: LiveStreamCategory[];
+  selectedCategory?: LiveStreamCategory | null;
+  onItemSelected?: (item: LiveStreamCategory) => void;
 }
 
 export const CategoriesList: React.FC<ICategoriesListProps> = (props) => {
   const { items, onItemSelected, selectedCategory } = props;
 
   const onItemClick = React.useCallback(
-    (item: ICategory) => {
+    (item: LiveStreamCategory) => {
       if (onItemSelected) {
         onItemSelected(item);
       }
@@ -25,7 +20,7 @@ export const CategoriesList: React.FC<ICategoriesListProps> = (props) => {
   );
 
   const renderItem = React.useCallback(
-    (item: ICategory) => {
+    (item: LiveStreamCategory) => {
       return (
         <div
           title={item.category_name}
