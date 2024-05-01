@@ -23,7 +23,7 @@ export const ChannelsList: React.FC<IChannelsListProps> = (props) => {
     (item: LiveStream) => {
       return (
         <div
-          title={item.name}
+          title={`${item.name} [${item.stream_id}]`}
           className={`side-nav-list-item ${
             item.stream_id === selectedChannel?.stream_id ? "active" : ""
           }`}
