@@ -4,6 +4,7 @@ import React from "react";
 import ReactPlayer from "react-player";
 
 interface IVideoPlayerProps {
+  stream: LiveStream;
 	streamUrl: string;
 	onClose?: () => void;
 }
