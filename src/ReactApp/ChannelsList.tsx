@@ -21,6 +21,7 @@ export const ChannelsList: React.FC<IChannelsListProps> = (props) => {
 
   const renderItem = React.useCallback(
     (item: LiveStream) => {
+      const iconUrl = item.stream_icon?.replace(/^http/, "iptv");
       return (
         <div
           title={`${item.name} [${item.stream_id}]`}
@@ -32,10 +33,10 @@ export const ChannelsList: React.FC<IChannelsListProps> = (props) => {
         >
           <div className="channel-list-item-content">
             <div className="channel-icon-wrapper">
-              {item.stream_icon && (
+              {iconUrl && (
                 <img
                   className="channel-icon"
-                  src={item.stream_icon}
+                  src={iconUrl}
                   loading="lazy"
                 />
               )}
