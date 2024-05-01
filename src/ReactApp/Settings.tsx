@@ -139,12 +139,14 @@ export const SettingsDialog: React.FC<ISettingsDialogProps> = ({
                 required
               />
               <TextField
+                type="password"
                 label="Username"
                 name="username"
                 value={values.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 errorMessage={errors.username}
+                canRevealPassword
                 required
               />
               <TextField
@@ -155,6 +157,7 @@ export const SettingsDialog: React.FC<ISettingsDialogProps> = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 errorMessage={errors.password}
+                canRevealPassword
                 required
               />
               <TextField
