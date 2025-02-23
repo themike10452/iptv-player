@@ -5,6 +5,7 @@ import { useBoolean } from "@fluentui/react-hooks";
 import { addDays, addHours, addMilliseconds, differenceInMinutes, format, isSameDay, startOfHour } from "date-fns";
 import { useSettings } from "./Settings";
 import { VideoJS } from "./VideoJS";
+import { TimeshiftMenu } from "./TimeshiftMenu";
 
 interface IVideoPlayerProps {
   stream: LiveStream;
@@ -12,17 +13,7 @@ interface IVideoPlayerProps {
 	onClose?: () => void;
 }
 
-interface TimeshiftOption {
-  title: string;
-  from: Date;
-  fromFormatted: string;
-  to: Date;
-  toFormatted: string;
-  duration: number;
-}
-
 export const VideoPlayer: React.FC<IVideoPlayerProps> = (props) => {
-  const { settings } = useSettings();
 	const { streamUrl, stream, onClose } = props;
 
   const [url, setUrl] = React.useState(streamUrl);
@@ -71,45 +62,11 @@ export const VideoPlayer: React.FC<IVideoPlayerProps> = (props) => {
 
   const timeshiftSupported = stream.tv_archive === 1;
 
-  const timeshiftOptions = React.useMemo(() => {
-    const now = new Date();
-    const minDate = startOfHour(addDays(now, -3));
+  const [timeshiftCalloutVisible, { toggle: toggleTimeshiftCallout, setFalse: hideTimeshiftCallout }] = useBoolean(false);
 
-    const options: TimeshiftOption[] = [];
-
-    for (let date = startOfHour(new Date()); date >= minDate; date = addHours(date, -1)) {
-      const from = date;
-      const to = addMilliseconds(addHours(from, 1), -1);
-
-      const title = isSameDay(from, now)
-        ? `${format(from, "hh:mm:ss a")} - ${format(to, "hh:mm:ss a")}`
-        : `${format(from, "E MMM dd hh:mm:ss a")} - ${format(to, "E MMM dd hh:mm:ss a")}`;
-
-      options.push({
-        title,
-        from,
-        fromFormatted: format(from, "HH:mm:ss"),
-        to,
-        toFormatted: format(to, "HH:mm:ss"),
-        duration: 60,
-      });
-    }
-
-    return options;
-  }, []);
-
-  const onClickTimeshiftOption = React.useCallback((e: TimeshiftOption) => {
-    const ts = format(e.from, `yyyy-MM-dd:HH-mm-ss`);
-    console.log(stream);
-    // setUrl(`${settings.url}/timeshift/${settings.username}/${settings.password}/${e.duration}/${ts}/${stream.stream_id}.m3u8`.replace("http", "iptv"));
-    setUrl(`${settings.url}/timeshift/${settings.username}/${settings.password}/${e.duration}/${ts}/${stream.stream_id}.m3u8`);
-  }, [settings, stream]);
-
-  const onClickBackToLiveOption = React.useCallback(() => {
-    setUrl(streamUrl);
-  }, [streamUrl]);
-
-  const [timeshiftCalloutVisible, { toggle: toggleTimeshiftCallout }] = useBoolean(false);
+  React.useEffect(() => {
+    hideTimeshiftCallout();
+  }, [stream, hideTimeshiftCallout]);
 
   return (
     <div className="video-player-wrapper">
@@ -166,19 +123,11 @@ export const VideoPlayer: React.FC<IVideoPlayerProps> = (props) => {
               onClick={toggleTimeshiftCallout}
             />
             <Callout target="#timeshift-menu" hidden={!timeshiftCalloutVisible}>
-              <div
-                style={{
-                  width: 400,
-                  height: 300,
-                  overflowX: "hidden",
-                  overflowY: "auto",
-                }}
-              >
-                <div style={{ padding: 8 }} onClick={onClickBackToLiveOption}>Live</div>
-                {timeshiftOptions.map((e, idx) => (
-                  <div key={idx} style={{ padding: 8 }} onClick={() => onClickTimeshiftOption(e)}>{e.title}</div>
-                ))}
-              </div>
+              <TimeshiftMenu
+                stream={stream}
+                setVideoUrl={setUrl}
+                hideMenu={hideTimeshiftCallout}
+              />
             </Callout>
           </>
         )}

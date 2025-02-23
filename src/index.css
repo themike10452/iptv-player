@@ -252,3 +252,28 @@ body {
 .player-seekbar {
   flex: 1 1 auto;
 }
+
+.catchup-menu {
+  width: 400px;
+  height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.catchup-menu-option {
+  padding: .5rem;
+  user-select: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.catchup-menu-option:hover {
+  background: rgba(200, 200, 200, 0.1);
+}
+
+.catchup-menu-option.active {
+  background: rgba(200, 200, 200, 0.1);
+}
