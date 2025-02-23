@@ -37,6 +37,8 @@ function IptvPlayer() {
   const [settingsDialogVisible, { toggle: toggleSettingsDialog }] =
     useBoolean(false);
 
+  const channelSearchBoxRef = React.useRef<HTMLDivElement>(null);
+
   const {
     data: categories,
     loading: loadingCategories,
@@ -58,7 +60,7 @@ function IptvPlayer() {
     }
 
     const url = new URL(settings.url);
-    const protocol = url.protocol === "https:" ? "iptvs:" : "iptv:";
+    const protocol = url.protocol?.replace(/^http/, "iptv");
     const optionalPort = url.port ? `:${url.port}` : "";
     return `${protocol}//${url.hostname}${optionalPort}/live/${settings.username}/${settings.password}/${activeChannel.stream_id}.m3u8`;
   }, [activeChannel, settings]);
@@ -89,10 +91,41 @@ function IptvPlayer() {
     window.location.reload();
   }, []);
 
+  const searchAllChannels = React.useCallback(() => {
+    setActiveCategory(categories[0]);
+
+    function focusAndSelect() {
+      const searchInput = channelSearchBoxRef.current?.querySelector("input[role=searchbox]") as HTMLInputElement;
+      if (searchInput && document.activeElement !== searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+
+    focusAndSelect();
+    setTimeout(focusAndSelect, 300);
+  }, [categories]);
+
+  React.useEffect(() => {
+    function onKeyPress(ev: KeyboardEvent) {
+      if (ev.keyCode === 6 && ev.ctrlKey) {
+        searchAllChannels();
+      }
+    }
+    
+    window.addEventListener("keypress", onKeyPress);
+    return () => window.removeEventListener("keypress", onKeyPress);
+  }, [searchAllChannels]);
+
   return (
     <>
       <div className="root">
         <div className="root-inner">
+          <div className="side-nav-0">
+            <IconButton iconProps={{ iconName: "TVMonitor" }} title="Live TV" />
+            <IconButton iconProps={{ iconName: "Slideshow" }} title="Series" />
+            <IconButton iconProps={{ iconName: "MyMoviesTV" }} title="VOD" />
+          </div>
           <div className="side-nav-1">
             <div className="side-nav-content-wrapper">
               <div className="side-nav-search-wrapper">
@@ -123,6 +156,7 @@ function IptvPlayer() {
             <div className="side-nav-content-wrapper">
               <div className="side-nav-search-wrapper">
                 <SearchBox
+                  ref={channelSearchBoxRef}
                   placeholder="Search"
                   value={channelSearchText}
                   onChange={(_, value) => {
@@ -155,10 +189,11 @@ function IptvPlayer() {
               <div className="action-bar-top--buttons">
                 <IconButton
                   iconProps={{ iconName: "Search" }}
+                  onClick={searchAllChannels}
                 />
-                {/* {activeChannel && (
+                {activeChannel && (
                   <IconButton iconProps={{ iconName: "FavoriteStar" }} />
-                )} */}
+                )}
                 <IconButton
                   iconProps={{ iconName: "Settings" }}
                   onClick={toggleSettingsDialog}

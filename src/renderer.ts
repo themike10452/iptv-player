@@ -28,3 +28,4 @@
 
 import './ReactApp/App';
 import './index.css';
+import 'video.js/dist/video-js.css';

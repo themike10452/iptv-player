@@ -35,7 +35,6 @@ export const useLiveCategories = () => {
             category_id: "",
             category_name: "All Channels",
           });
-          console.log(categories);
           setData(categories);
           setError(null);
         } else {
@@ -81,7 +80,6 @@ export const useLiveChannels = (categoryId?: string | null) => {
       })
       .then((res) => {
         if (res.success) {
-          console.log(res.data);
           setData(res.data);
           setError(null);
         } else {
