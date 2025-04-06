@@ -87,10 +87,10 @@ export const TimeshiftMenu: React.FC<TimeshiftMenuProps> = (props) => {
 	useOnClickOutside(ref, hideMenu);
 
 	return (
-		<div ref={ref} className="catchup-menu">
-			<div className={classNames("catchup-menu-option", { active: !selectedOptionId })} onClick={switchToLiveStream}>Live</div>
+		<div ref={ref} className="timeshift-menu">
+			<div className={classNames("timeshift-menu-option", { active: !selectedOptionId })} onClick={switchToLiveStream}>Live</div>
 			{timeshiftOptions.map((e, idx) => (
-				<div key={idx} className={classNames("catchup-menu-option", { active: e.id === selectedOptionId })} onClick={() => onClickTimeshiftOption(e)}>{e.title}</div>
+				<div key={idx} className={classNames("timeshift-menu-option", { active: e.id === selectedOptionId })} onClick={() => onClickTimeshiftOption(e)}>{e.title}</div>
 			))}
 		</div>
 	)

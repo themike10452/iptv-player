@@ -253,14 +253,14 @@ body {
   flex: 1 1 auto;
 }
 
-.catchup-menu {
+.timeshift-menu {
   width: 400px;
   height: 300px;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.catchup-menu-option {
+.timeshift-menu-option {
   padding: .5rem;
   user-select: none;
   cursor: pointer;
@@ -270,10 +270,10 @@ body {
   white-space: nowrap;
 }
 
-.catchup-menu-option:hover {
+.timeshift-menu-option:hover {
   background: rgba(200, 200, 200, 0.1);
 }
 
-.catchup-menu-option.active {
+.timeshift-menu-option.active {
   background: rgba(200, 200, 200, 0.1);
 }
