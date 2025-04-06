@@ -1,8 +1,8 @@
 import React from "react";
+import classNames from "classnames";
+import { IconButton } from "@fluentui/react";
 import { addDays, addHours, addMilliseconds, format, isSameDay, startOfHour } from "date-fns";
 import { useSettings } from "./Settings";
-import classNames from "classnames";
-import { useOnClickOutside } from "usehooks-ts";
 
 interface TimeshiftOption {
 	id: string;
@@ -38,8 +38,8 @@ export const TimeshiftMenu: React.FC<TimeshiftMenuProps> = (props) => {
 			const to = addMilliseconds(addHours(from, 1), -1);
 
 			const title = isSameDay(from, now)
-				? `${format(from, "hh:mm:ss a")} - ${format(to, "hh:mm:ss a")}`
-				: `${format(from, "E MMM dd hh:mm:ss a")} - ${format(to, "E MMM dd hh:mm:ss a")}`;
+				? `${format(from, "hh:mm a")} - ${format(to, "hh:mm a")}`
+				: `${format(from, "E MMM d / hh:mm a")} - ${format(to, "hh:mm a")}`;
 
 			const id = `${stream.stream_id}-${format(from, "yyyyMMddHHmmss")}-${format(to, "yyyyMMddHHmmss")}`;
 
@@ -74,24 +74,27 @@ export const TimeshiftMenu: React.FC<TimeshiftMenuProps> = (props) => {
 			// setUrl(`${settings.url}/timeshift/${settings.username}/${settings.password}/${e.duration}/${ts}/${stream.stream_id}.m3u8`.replace("http", "iptv"));
 			setVideoUrl(`${settings.url}/timeshift/${settings.username}/${settings.password}/${e.duration}/${ts}/${stream.stream_id}.m3u8`);
 			setSelectedOptionId(e.id);
-			hideMenu();
-		}, [stream, settings, hideMenu, setVideoUrl]);
+		}, [stream, settings, setVideoUrl]);
 
 	const switchToLiveStream = React.useCallback(() => {
 		setVideoUrl(liveStreamUrl);
 		setSelectedOptionId(null);
-		hideMenu();
-	}, [liveStreamUrl, hideMenu, setVideoUrl]);
-
-	const ref = React.useRef(null);
-	useOnClickOutside(ref, hideMenu);
+	}, [liveStreamUrl, setVideoUrl]);
 
 	return (
-		<div ref={ref} className="timeshift-menu">
-			<div className={classNames("timeshift-menu-option", { active: !selectedOptionId })} onClick={switchToLiveStream}>Live</div>
-			{timeshiftOptions.map((e, idx) => (
-				<div key={idx} className={classNames("timeshift-menu-option", { active: e.id === selectedOptionId })} onClick={() => onClickTimeshiftOption(e)}>{e.title}</div>
-			))}
+		<div className="timeshift-menu">
+			<div className="timeshift-menu-header">
+				<IconButton
+					iconProps={{ iconName: "Cancel" }}
+					onClick={hideMenu}
+				/>
+			</div>
+			<div className="timeshift-menu-scroll scroll">
+				<div className={classNames("timeshift-menu-option", { active: !selectedOptionId })} onClick={switchToLiveStream}>Live</div>
+				{timeshiftOptions.map((e, idx) => (
+					<div key={idx} className={classNames("timeshift-menu-option", { active: e.id === selectedOptionId })} onClick={() => onClickTimeshiftOption(e)}>{e.title}</div>
+				))}
+			</div>
 		</div>
 	)
 };
